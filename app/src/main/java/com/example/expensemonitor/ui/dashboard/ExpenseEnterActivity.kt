@@ -1,6 +1,5 @@
 package com.example.expensemonitor.ui.dashboard
 
-import android.R.attr.scaleY
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,6 +14,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,10 +32,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedCard
@@ -60,6 +60,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.expensemonitor.ui.navigation.AppNavigation
 import com.example.expensemonitor.ui.theme.ExpenseMonitorTheme
 
 class ExpenseEnterActivity : ComponentActivity() {
@@ -72,7 +73,8 @@ class ExpenseEnterActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
                     Column(modifier = Modifier.padding(innerPadding)) {
-                        HomeScreen()
+                        AppNavigation()
+
                     }
 
 
@@ -82,13 +84,12 @@ class ExpenseEnterActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreenMain() {
 
     var amount by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf("Food") }
 
     val categories = listOf(
         "🍔 Food",
@@ -96,193 +97,356 @@ fun HomeScreen() {
         "🚕 Travel",
         "🛍 Shopping",
         "💡 Bills",
-        "🎬 Entertainment",
+        "🎬 Fun",
         "🏥 Medical",
-        "➕ Other"
+        "📚 Education",
+        "📚 Other"
     )
 
-    Scaffold(
-        containerColor = Color(0xFF000000)
-    ) { padding ->
+    var selectedCategory by remember {
+        mutableStateOf(categories.first())
+    }
 
-        Column(
+    val budget = 10000f
+    val spent = 6350f
+    val progress by animateFloatAsState(
+        targetValue = spent / budget,
+        animationSpec = tween(1200),
+        label = ""
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF070707))
+            .verticalScroll(rememberScrollState())
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 110.dp),
+
+    ) {
+
+        Text(
+            text = "Expense Tracker",
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
+
+        Text(
+            text = "Manage your daily expenses",
+            color = Color.Gray
+        )
+
+        Spacer(Modifier.height(24.dp))
+
+        // Glass Card
+        Card(
             modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(20.dp)
+                .fillMaxWidth()
+                .height(180.dp),
+            shape = RoundedCornerShape(30.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White.copy(alpha = 0.20f)
+            ),
+            border = BorderStroke(
+                1.dp,
+                Color.White.copy(alpha = .4f)
+            )
         ) {
 
-
-            Text(
-                text = "Expense Tracker",
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                color= Color.White
-            )
-
-            Text(
-                text = "Track your daily expenses",
-                color = Color.Gray
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF4CAF50)
-                ),
-                shape = RoundedCornerShape(20.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.linearGradient(
+                            listOf(
+                                Color(0xFF00C9FF),
+                                Color(0xFF92FE9D)
+                            )
+                        )
+                    )
+                    .padding(20.dp)
             ) {
 
-                Column(
-                    modifier = Modifier.padding(20.dp)
-                ) {
+                Column {
+
 
                     Text(
-                        "Today's Spending",
-                        color = Color.White.copy(alpha = 0.8f)
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        "₹ 2,350",
-                        color = Color.White,
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(28.dp))
-
-            OutlinedTextField(
-                value = amount,
-                onValueChange = {
-                    amount = it.filter { char -> char.isDigit() }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                label = {
-                    Text("Amount")
-                },
-                leadingIcon = {
-                    Text(
-                        "₹",
-                        fontSize = 22.sp,
+                        "Monthly Budget",
                         color = Color.White
                     )
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
-                ),
-                shape = RoundedCornerShape(16.dp)
-            )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(Modifier.height(10.dp))
 
-            Text(
-                "Expense Category",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp,
-                color = Color.Red
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-
-                categories.forEach {
-
-                    FilterChip(
-                        selected = selectedCategory == it,
-                        onClick = {
-                            selectedCategory = it
-                        },
-                        label = {
-                            Text(it)
-                        }
+                    Text(
+                        "₹10,000",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        fontSize = 34.sp
                     )
+
+                    Spacer(Modifier.height(20.dp))
+
+                    LinearProgressIndicator(
+                        progress = progress,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp),
+                        color = Color.White,
+                        trackColor = Color.White.copy(.25f)
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Text(
+                        "Spent ₹6,350",
+                        color = Color.White
+                    )
+                    Spacer(Modifier.height(12.dp))
+
+
                 }
+
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+        }
 
-            OutlinedTextField(
-                value = description,
-                onValueChange = {
-                    description = it
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                label = {
-                    Text("Description (Optional)")
-                },
-                shape = RoundedCornerShape(16.dp)
-            )
+        Spacer(Modifier.height(30.dp))
 
-            Spacer(modifier = Modifier.height(24.dp))
+        // Circular Budget Progress
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
 
-            OutlinedCard(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp)
+            Box(
+                modifier = Modifier.size(220.dp),
+                contentAlignment = Alignment.Center
             ) {
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-
-                        }
-                        .padding(18.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                Canvas(
+                    modifier = Modifier.fillMaxSize()
                 ) {
 
-                    Text("Today")
-
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = null
+                    drawArc(
+                        color = Color.LightGray.copy(alpha = .3f),
+                        startAngle = -90f,
+                        sweepAngle = 360f,
+                        useCenter = false,
+                        style = Stroke(
+                            width = 22f,
+                            cap = StrokeCap.Round
+                        )
                     )
+
+                    drawArc(
+                        brush = Brush.sweepGradient(
+                            listOf(
+                                Color(0xFF00C853),
+                                Color(0xFF64DD17),
+                                Color(0xFF00C853)
+                            )
+                        ),
+                        startAngle = -90f,
+                        sweepAngle = progress * 360,
+                        useCenter = false,
+                        style = Stroke(
+                            width = 22f,
+                            cap = StrokeCap.Round
+                        )
+                    )
+
                 }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    Text(
+                        "${(progress * 100).toInt()}%",
+                        fontSize = 34.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+
+                    Text(
+                        "Budget Used",
+                        color = Color.White
+                    )
+
+                }
+
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+        }
 
-            Button(
-                onClick = {
+        Spacer(Modifier.height(30.dp))
 
-                },
+        Text(
+            "Expense Category",
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+
+            categories.forEach { category ->
+
+                val selected = category == selectedCategory
+
+                val scale by animateFloatAsState(
+                    if (selected) 1.08f else 1f,
+                    label = ""
+                )
+
+                val color by animateColorAsState(
+                    if (selected)
+                        Color(0xFF00C853)
+                    else
+                        Color.White,
+                    label = ""
+                )
+
+                Surface(
+                    modifier = Modifier
+                        .graphicsLayer {
+                            scaleX = scale
+                            scaleY = scale
+                        }
+                        .clickable {
+                            selectedCategory = category
+                        },
+                    color = color,
+                    shadowElevation = if (selected) 10.dp else 2.dp,
+                    shape = RoundedCornerShape(50)
+                ) {
+
+                    Text(
+                        text = category,
+                        modifier = Modifier.padding(
+                            horizontal = 18.dp,
+                            vertical = 10.dp
+                        ),
+                        color =
+                            if (selected)
+                                Color.White
+                            else
+                                Color.Black
+                    )
+
+                }
+
+            }
+
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        OutlinedTextField(
+            value = amount,
+            onValueChange = {
+                amount = it.filter(Char::isDigit)
+            },
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = {
+                Text("₹")
+            },
+            label = {
+                Text("Expense Amount")
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
+            shape = RoundedCornerShape(18.dp)
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        OutlinedTextField(
+            value = description,
+            onValueChange = {
+                description = it
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp),
+            label = {
+                Text("Description")
+            },
+            shape = RoundedCornerShape(18.dp)
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        OutlinedCard(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(18.dp)
+        ) {
+
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(18.dp)
+                    .padding(18.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
-                Icon(Icons.Default.Add, null)
+                Text("Today")
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    "Add Expense",
-                    fontSize = 18.sp
+                Icon(
+                    Icons.Default.DateRange,
+                    null
                 )
+
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
         }
+
+        Spacer(Modifier.height(30.dp))
+
+        Button(
+            onClick = {
+
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(58.dp),
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF00C853)
+            )
+        ) {
+
+            Icon(
+                Icons.Default.Add,
+                null
+            )
+
+            Spacer(Modifier.width(8.dp))
+
+            Text(
+                "Add Expense",
+                fontSize = 18.sp
+            )
+
+        }
+
+        Spacer(Modifier.height(40.dp))
+
     }
+
 }
+
 
 @Preview(showBackground = true)
 @Composable
-fun HomeScreenPreview(){
+fun HomeScreenPreview() {
     ExpenseMonitorTheme {
-        HomeScreen()
+        HomeScreenMain()
     }
 }
 
