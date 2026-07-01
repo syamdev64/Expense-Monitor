@@ -13,14 +13,26 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 object ExpenseUtils {
 
+//    fun getIcon(category: String): ImageVector {
+//        return when (category) {
+//            "🍔 Food" -> Icons.Default.Fastfood
+//            "☕ Coffee" -> Icons.Default.Coffee
+//            "🚕 Travel" -> Icons.Default.DirectionsCar
+//            "🛍 Shopping" -> Icons.Default.ShoppingBag
+//            "💡 Bills" -> Icons.Default.Receipt
+//            "🏥 Medical" -> Icons.Default.LocalHospital
+//            else -> Icons.Default.Payments
+//        }
+//    }
+
     fun getIcon(category: String): ImageVector {
         return when (category) {
-            "🍔 Food" -> Icons.Default.Fastfood
-            "☕ Coffee" -> Icons.Default.Coffee
-            "🚕 Travel" -> Icons.Default.DirectionsCar
-            "🛍 Shopping" -> Icons.Default.ShoppingBag
-            "💡 Bills" -> Icons.Default.Receipt
-            "🏥 Medical" -> Icons.Default.LocalHospital
+            "Food" -> Icons.Default.Fastfood
+            "Coffee" -> Icons.Default.Coffee
+            "Travel" -> Icons.Default.DirectionsCar
+            "Shopping" -> Icons.Default.ShoppingBag
+            "Bills" -> Icons.Default.Receipt
+            "Medical" -> Icons.Default.LocalHospital
             else -> Icons.Default.Payments
         }
     }

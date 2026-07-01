@@ -37,6 +37,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedCard
@@ -63,6 +64,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.expensemonitor.categorylist.ExpenseCategory
 import com.example.expensemonitor.expenseviewmodel.ExpenseViewModel
 import com.example.expensemonitor.ui.navigation.AppNavigation
 import com.example.expensemonitor.ui.theme.ExpenseMonitorTheme
@@ -98,20 +100,21 @@ fun HomeScreenMain() {
 
     val viewModel: ExpenseViewModel = viewModel()
 
-    val categories = listOf(
-        "🍔 Food",
-        "☕ Coffee",
-        "🚕 Travel",
-        "🛍 Shopping",
-        "💡 Bills",
-        "🎬 Fun",
-        "🏥 Medical",
-        "📚 Education",
-        "📚 Other"
-    )
+    val categories = ExpenseCategory.entries
+//    val categories = listOf(
+//        "🍔 Food",
+//        "☕ Coffee",
+//        "🚕 Travel",
+//        "🛍 Shopping",
+//        "💡 Bills",
+//        "🎬 Fun",
+//        "🏥 Medical",
+//        "📚 Education",
+//        "📚 Other"
+//    )
 
     var selectedCategory by remember {
-        mutableStateOf(categories.first())
+        mutableStateOf(ExpenseCategory.FOOD)
     }
 
     val budget = 10000f
@@ -287,68 +290,65 @@ fun HomeScreenMain() {
 
             categories.forEach { category ->
 
-                val selected = category == selectedCategory
+                FilterChip(
 
-                val scale by animateFloatAsState(
-                    if (selected) 1.08f else 1f, label = ""
+                    selected = selectedCategory == category,
+
+                    onClick = {
+
+                        selectedCategory = category
+
+                    },
+
+                    label = {
+
+                        Text(category.title)
+
+                    },
+
+                    leadingIcon = {
+
+                        Icon(
+
+                            imageVector = category.icon,
+
+                            contentDescription = null,
+
+                            tint = category.color
+
+                        )
+
+                    }
+
                 )
-
-                val color by animateColorAsState(
-                    if (selected) Color(0xFF00C853)
-                    else Color.White, label = ""
-                )
-
-                Surface(
-                    modifier = Modifier
-                        .graphicsLayer {
-                            scaleX = scale
-                            scaleY = scale
-                        }
-                        .clickable {
-                            selectedCategory = category
-                        },
-                    color = color,
-                    shadowElevation = if (selected) 10.dp else 2.dp,
-                    shape = RoundedCornerShape(50)
-                ) {
-
-                    Text(
-                        text = category, modifier = Modifier.padding(
-                            horizontal = 18.dp, vertical = 10.dp
-                        ), color = if (selected) Color.White
-                        else Color.Black
-                    )
-
-                }
 
             }
-
         }
 
         Spacer(Modifier.height(24.dp))
 
         OutlinedTextField(
             value = amount, onValueChange = {
-            amount = it.filter(Char::isDigit)
-        }, modifier = Modifier.fillMaxWidth(), leadingIcon = {
-            Text("₹")
-        }, label = {
-            Text("Expense Amount")
-        }, keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number
-        ), shape = RoundedCornerShape(18.dp)
+                amount = it.filter(Char::isDigit)
+            }, modifier = Modifier.fillMaxWidth(), leadingIcon = {
+                Text("₹")
+            }, label = {
+                Text("Expense Amount")
+            }, keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ), shape = RoundedCornerShape(18.dp)
         )
 
         Spacer(Modifier.height(20.dp))
 
         OutlinedTextField(
             value = description, onValueChange = {
-            description = it
-        }, modifier = Modifier
+                description = it
+            }, modifier = Modifier
                 .fillMaxWidth()
                 .height(120.dp), label = {
-            Text("Description")
-        }, shape = RoundedCornerShape(18.dp)
+                Text("Description")
+            }, shape = RoundedCornerShape(18.dp)
         )
 
         Spacer(Modifier.height(20.dp))
@@ -383,7 +383,7 @@ fun HomeScreenMain() {
 
                     viewModel.insert(
                         amount = amount.toDouble(),
-                        category = selectedCategory,
+                        category = selectedCategory.name,
                         description = description
                     )
 

@@ -16,4 +16,5 @@ data class ExpenseEntity(
     val description: String,
 
     val date: Long
+
 )

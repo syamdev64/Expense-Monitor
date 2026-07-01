@@ -59,6 +59,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.expensemonitor.categorylist.ExpenseCategory
 import com.example.expensemonitor.expenseviewmodel.ExpenseViewModel
 import com.example.expensemonitor.modelclass.Expense
 import com.example.expensemonitor.modelclass.FilterType
@@ -140,6 +141,11 @@ fun ExpenseCard(
         Locale.getDefault()
     )
 
+    val category = remember(expense.category) {
+
+        ExpenseCategory.fromName(expense.category)
+
+    }
     val formattedDate = formatter.format(Date(expense.date))
 
     val iconColor = ExpenseUtils.getColor(expense.category)
@@ -171,14 +177,14 @@ fun ExpenseCard(
                 modifier = Modifier
                     .size(56.dp)
                     .clip(CircleShape)
-                    .background(iconColor.copy(alpha = .15f)),
+                    .background(category.color.copy(.15f)),
                 contentAlignment = Alignment.Center
             ) {
 
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = iconColor,
+                    tint = category.color,
                     modifier = Modifier.size(28.dp)
                 )
 
@@ -191,7 +197,7 @@ fun ExpenseCard(
             ) {
 
                 Text(
-                    text = expense.category,
+                    text = category.title,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
                 )
