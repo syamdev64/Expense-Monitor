@@ -1,6 +1,7 @@
 package com.example.expensemonitor.ui.dashboard
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -55,11 +56,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.expensemonitor.expenseviewmodel.ExpenseViewModel
 import com.example.expensemonitor.ui.navigation.AppNavigation
 import com.example.expensemonitor.ui.theme.ExpenseMonitorTheme
 
@@ -90,6 +94,9 @@ fun HomeScreenMain() {
 
     var amount by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    val viewModel: ExpenseViewModel = viewModel()
 
     val categories = listOf(
         "🍔 Food",
@@ -110,9 +117,7 @@ fun HomeScreenMain() {
     val budget = 10000f
     val spent = 6350f
     val progress by animateFloatAsState(
-        targetValue = spent / budget,
-        animationSpec = tween(1200),
-        label = ""
+        targetValue = spent / budget, animationSpec = tween(1200), label = ""
     )
 
     Column(
@@ -122,7 +127,7 @@ fun HomeScreenMain() {
             .verticalScroll(rememberScrollState())
             .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 110.dp),
 
-    ) {
+        ) {
 
         Text(
             text = "Expense Tracker",
@@ -132,8 +137,7 @@ fun HomeScreenMain() {
         )
 
         Text(
-            text = "Manage your daily expenses",
-            color = Color.Gray
+            text = "Manage your daily expenses", color = Color.Gray
         )
 
         Spacer(Modifier.height(24.dp))
@@ -148,8 +152,7 @@ fun HomeScreenMain() {
                 containerColor = Color.White.copy(alpha = 0.20f)
             ),
             border = BorderStroke(
-                1.dp,
-                Color.White.copy(alpha = .4f)
+                1.dp, Color.White.copy(alpha = .4f)
             )
         ) {
 
@@ -159,8 +162,7 @@ fun HomeScreenMain() {
                     .background(
                         Brush.linearGradient(
                             listOf(
-                                Color(0xFF00C9FF),
-                                Color(0xFF92FE9D)
+                                Color(0xFF00C9FF), Color(0xFF92FE9D)
                             )
                         )
                     )
@@ -171,8 +173,7 @@ fun HomeScreenMain() {
 
 
                     Text(
-                        "Monthly Budget",
-                        color = Color.White
+                        "Monthly Budget", color = Color.White
                     )
 
                     Spacer(Modifier.height(10.dp))
@@ -198,8 +199,7 @@ fun HomeScreenMain() {
                     Spacer(Modifier.height(12.dp))
 
                     Text(
-                        "Spent ₹6,350",
-                        color = Color.White
+                        "Spent ₹6,350", color = Color.White
                     )
                     Spacer(Modifier.height(12.dp))
 
@@ -214,14 +214,11 @@ fun HomeScreenMain() {
 
         // Circular Budget Progress
         Box(
-            modifier = Modifier
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
         ) {
 
             Box(
-                modifier = Modifier.size(220.dp),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.size(220.dp), contentAlignment = Alignment.Center
             ) {
 
                 Canvas(
@@ -234,25 +231,21 @@ fun HomeScreenMain() {
                         sweepAngle = 360f,
                         useCenter = false,
                         style = Stroke(
-                            width = 22f,
-                            cap = StrokeCap.Round
+                            width = 22f, cap = StrokeCap.Round
                         )
                     )
 
                     drawArc(
                         brush = Brush.sweepGradient(
                             listOf(
-                                Color(0xFF00C853),
-                                Color(0xFF64DD17),
-                                Color(0xFF00C853)
+                                Color(0xFF00C853), Color(0xFF64DD17), Color(0xFF00C853)
                             )
                         ),
                         startAngle = -90f,
                         sweepAngle = progress * 360,
                         useCenter = false,
                         style = Stroke(
-                            width = 22f,
-                            cap = StrokeCap.Round
+                            width = 22f, cap = StrokeCap.Round
                         )
                     )
 
@@ -270,8 +263,7 @@ fun HomeScreenMain() {
                     )
 
                     Text(
-                        "Budget Used",
-                        color = Color.White
+                        "Budget Used", color = Color.White
                     )
 
                 }
@@ -283,9 +275,7 @@ fun HomeScreenMain() {
         Spacer(Modifier.height(30.dp))
 
         Text(
-            "Expense Category",
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.sp
+            "Expense Category", fontWeight = FontWeight.Bold, fontSize = 18.sp
         )
 
         Spacer(Modifier.height(12.dp))
@@ -300,16 +290,12 @@ fun HomeScreenMain() {
                 val selected = category == selectedCategory
 
                 val scale by animateFloatAsState(
-                    if (selected) 1.08f else 1f,
-                    label = ""
+                    if (selected) 1.08f else 1f, label = ""
                 )
 
                 val color by animateColorAsState(
-                    if (selected)
-                        Color(0xFF00C853)
-                    else
-                        Color.White,
-                    label = ""
+                    if (selected) Color(0xFF00C853)
+                    else Color.White, label = ""
                 )
 
                 Surface(
@@ -327,16 +313,10 @@ fun HomeScreenMain() {
                 ) {
 
                     Text(
-                        text = category,
-                        modifier = Modifier.padding(
-                            horizontal = 18.dp,
-                            vertical = 10.dp
-                        ),
-                        color =
-                            if (selected)
-                                Color.White
-                            else
-                                Color.Black
+                        text = category, modifier = Modifier.padding(
+                            horizontal = 18.dp, vertical = 10.dp
+                        ), color = if (selected) Color.White
+                        else Color.Black
                     )
 
                 }
@@ -348,44 +328,33 @@ fun HomeScreenMain() {
         Spacer(Modifier.height(24.dp))
 
         OutlinedTextField(
-            value = amount,
-            onValueChange = {
-                amount = it.filter(Char::isDigit)
-            },
-            modifier = Modifier.fillMaxWidth(),
-            leadingIcon = {
-                Text("₹")
-            },
-            label = {
-                Text("Expense Amount")
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number
-            ),
-            shape = RoundedCornerShape(18.dp)
+            value = amount, onValueChange = {
+            amount = it.filter(Char::isDigit)
+        }, modifier = Modifier.fillMaxWidth(), leadingIcon = {
+            Text("₹")
+        }, label = {
+            Text("Expense Amount")
+        }, keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number
+        ), shape = RoundedCornerShape(18.dp)
         )
 
         Spacer(Modifier.height(20.dp))
 
         OutlinedTextField(
-            value = description,
-            onValueChange = {
-                description = it
-            },
-            modifier = Modifier
+            value = description, onValueChange = {
+            description = it
+        }, modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp),
-            label = {
-                Text("Description")
-            },
-            shape = RoundedCornerShape(18.dp)
+                .height(120.dp), label = {
+            Text("Description")
+        }, shape = RoundedCornerShape(18.dp)
         )
 
         Spacer(Modifier.height(20.dp))
 
         OutlinedCard(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(18.dp)
+            modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp)
         ) {
 
             Row(
@@ -398,8 +367,7 @@ fun HomeScreenMain() {
                 Text("Today")
 
                 Icon(
-                    Icons.Default.DateRange,
-                    null
+                    Icons.Default.DateRange, null
                 )
 
             }
@@ -410,6 +378,23 @@ fun HomeScreenMain() {
 
         Button(
             onClick = {
+
+                if (amount.isNotEmpty()) {
+
+                    viewModel.insert(
+                        amount = amount.toDouble(),
+                        category = selectedCategory,
+                        description = description
+                    )
+
+                    amount = ""
+                    description = ""
+
+                    Toast.makeText(
+                        context, "Expense Added", Toast.LENGTH_SHORT
+                    ).show()
+
+                }
 
             },
             modifier = Modifier
@@ -422,15 +407,13 @@ fun HomeScreenMain() {
         ) {
 
             Icon(
-                Icons.Default.Add,
-                null
+                Icons.Default.Add, null
             )
 
             Spacer(Modifier.width(8.dp))
 
             Text(
-                "Add Expense",
-                fontSize = 18.sp
+                "Add Expense", fontSize = 18.sp
             )
 
         }
