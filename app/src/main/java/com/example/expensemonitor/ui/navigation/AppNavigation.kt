@@ -13,10 +13,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.*
 import com.example.expensemonitor.ui.components.GlassBottomBar
-import com.example.expensemonitor.ui.dashboard.ExpenseScreen
 import com.example.expensemonitor.ui.dashboard.HomeScreenMain
 import com.example.expensemonitor.ui.dashboard.ProfileScreen
 import com.example.expensemonitor.ui.dashboard.ReportScreen
+import com.example.expensemonitor.ui.expensereport.ExpenseScreen
 
 @Composable
 fun AppNavigation() {

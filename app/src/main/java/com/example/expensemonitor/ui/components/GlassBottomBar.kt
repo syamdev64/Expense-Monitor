@@ -42,7 +42,7 @@ import com.example.expensemonitor.ui.navigation.BottomNavItem
 fun GlassBottomBar(
     navController: NavHostController,
     modifier: Modifier = Modifier
-){
+) {
 
     val items = listOf(
         BottomNavItem.Home,
@@ -58,19 +58,19 @@ fun GlassBottomBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 8.dp),
+            .padding(horizontal = 24.dp, vertical = 2.dp),
         contentAlignment = Alignment.Center
     ) {
 
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(82.dp),
+                .height(72.dp),
 
             shape = RoundedCornerShape(30.dp),
 
             colors = CardDefaults.cardColors(
-                containerColor = Color.White.copy(alpha = 0.08f)
+                containerColor = Color.Black.copy(alpha = 0.8f)
             ),
 
             border = BorderStroke(
