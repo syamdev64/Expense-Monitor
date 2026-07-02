@@ -78,7 +78,7 @@ class ExpenseEnterActivity : ComponentActivity() {
             ExpenseMonitorTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
-                    Column(modifier = Modifier.padding(innerPadding)) {
+                    Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
                         AppNavigation()
 
                     }

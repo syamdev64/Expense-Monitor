@@ -13,7 +13,7 @@ kotlin {
 android {
     namespace = "com.example.expensemonitor"
     compileSdk {
-        version = release(36) {
+        version = release(37) {
             minorApiLevel = 1
         }
     }
@@ -62,13 +62,11 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
-    implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.compose.foundation:foundation")
-    implementation(platform("androidx.compose:compose-bom:2025.01.00"))
-    implementation("androidx.lifecycle:lifecycle-runtime-compose")
-    implementation("androidx.navigation:navigation-compose:2.8.7")
-    implementation("androidx.navigation:navigation-compose:2.9.0")
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    kapt("androidx.room:room-compiler:2.6.1")
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
 }

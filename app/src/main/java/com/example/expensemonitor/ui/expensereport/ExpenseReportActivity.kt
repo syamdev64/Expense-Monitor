@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -64,10 +65,10 @@ import com.example.expensemonitor.expenseviewmodel.ExpenseViewModel
 import com.example.expensemonitor.modelclass.Expense
 import com.example.expensemonitor.modelclass.FilterType
 import com.example.expensemonitor.roomdb.ExpenseEntity
-import com.example.expensemonitor.ui.components.ExpenseUtils
 import com.example.expensemonitor.ui.theme.ExpenseMonitorTheme
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Calendar
 import java.util.Locale
 import kotlin.collections.emptyList
 
@@ -80,7 +81,7 @@ class ExpenseReportActivity : ComponentActivity() {
             ExpenseMonitorTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
-                    Column(modifier = Modifier.padding(innerPadding)) {
+                    Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
                         ExpenseScreen()
                     }
 
@@ -134,7 +135,9 @@ fun ExpenseCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     onEdit: () -> Unit = {},
-    onDelete: () -> Unit = {}
+    onDelete: () -> Unit = {
+
+    }
 ) {
     val formatter = SimpleDateFormat(
         "dd MMM yyyy • hh:mm a",
@@ -148,18 +151,16 @@ fun ExpenseCard(
     }
     val formattedDate = formatter.format(Date(expense.date))
 
-    val iconColor = ExpenseUtils.getColor(expense.category)
-    val icon = ExpenseUtils.getIcon(expense.category)
     var expanded by remember { mutableStateOf(false) }
 
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 12.dp, vertical = 8.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(22.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .6f)
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -169,23 +170,23 @@ fun ExpenseCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(18.dp),
+                .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
             Box(
                 modifier = Modifier
-                    .size(56.dp)
+                    .size(48.dp)
                     .clip(CircleShape)
                     .background(category.color.copy(.15f)),
                 contentAlignment = Alignment.Center
             ) {
 
                 Icon(
-                    imageVector = icon,
+                    imageVector = category.icon,
                     contentDescription = null,
                     tint = category.color,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(26.dp)
                 )
 
             }
@@ -199,10 +200,10 @@ fun ExpenseCard(
                 Text(
                     text = category.title,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
+                    fontSize = 16.sp
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
                     text = expense.description,
@@ -211,7 +212,7 @@ fun ExpenseCard(
                     maxLines = 1
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
                     text = formattedDate,
@@ -229,10 +230,10 @@ fun ExpenseCard(
                     text = "- ₹${expense.amount.toInt()}",
                     color = Color.Red,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
+                    fontSize = 16.sp
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Box {
 
@@ -315,20 +316,36 @@ fun ExpenseScreen() {
         mutableStateOf(FilterType.TODAY)
     }
 
-    val filteredExpenses = remember(search, filter) {
+    val filteredExpenses = expenses.filter { expense ->
 
-        expenses.filter {
+        val categoryTitle =
+            ExpenseCategory.fromName(expense.category).title
 
-            it.category.contains(search, true) ||
-                    it.description.contains(search, true)
+        val searchMatches =
+            categoryTitle.contains(search, true) ||
+                    expense.description.contains(search, true)
 
-            // Date filtering will be added later
+        val dateMatches = when (filter) {
+
+            FilterType.TODAY ->
+                isToday(expense.date)
+
+            FilterType.WEEK ->
+                isThisWeek(expense.date)
+
+            FilterType.MONTH ->
+                isThisMonth(expense.date)
+
         }
 
+        searchMatches && dateMatches
     }
 
     Column(
         modifier = Modifier.fillMaxSize()
+            .background(Color(0xFF070707))
+            .padding(12.dp)
+
     ) {
 
         SearchAndFilterSection(
@@ -344,13 +361,18 @@ fun ExpenseScreen() {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        LazyColumn {
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            contentPadding = PaddingValues(
+                top = 4.dp,
+                bottom = 100.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        )
+        {
 
-            items(expenses) { expense ->
-                ExpenseCard(
-                    expense = expense
-                )
-
+            items(filteredExpenses) { expense ->
+                ExpenseCard(expense)
             }
 
         }
@@ -376,6 +398,7 @@ fun SearchAndFilterSection(
             value = searchQuery,
             onValueChange = onSearchChange,
             modifier = Modifier.fillMaxWidth(),
+
             placeholder = {
                 Text("Search category or description")
             },
@@ -424,21 +447,22 @@ fun FilterChipItem(
         if (selected)
             Color(0xFF00C853)
         else
-            Color.LightGray.copy(alpha = .2f),
+            Color.White.copy(alpha = .4f),
         label = ""
     )
 
     Surface(
         modifier = Modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(50),
+        shape = RoundedCornerShape(40),
         color = background
     ) {
 
         Text(
             text = text,
+            fontSize = 11.sp,
             modifier = Modifier.padding(
-                horizontal = 18.dp,
-                vertical = 10.dp
+                horizontal = 14.dp,
+                vertical = 7.dp
             ),
             color =
                 if (selected)
@@ -450,6 +474,36 @@ fun FilterChipItem(
     }
 
 }
+
+/**
+ * Date Helper Functions
+ */
+private fun isToday(timeInMillis: Long): Boolean {
+    val cal1 = Calendar.getInstance()
+    val cal2 = Calendar.getInstance().apply { this.timeInMillis = timeInMillis }
+    return cal1.get(Calendar.ERA) == cal2.get(Calendar.ERA) &&
+            cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+            cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+}
+
+private fun isThisWeek(timeInMillis: Long): Boolean {
+    val cal1 = Calendar.getInstance()
+    val cal2 = Calendar.getInstance().apply { this.timeInMillis = timeInMillis }
+    return cal1.get(Calendar.ERA) == cal2.get(Calendar.ERA) &&
+            cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+            cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR)
+}
+
+private fun isThisMonth(timeInMillis: Long): Boolean {
+    val cal1 = Calendar.getInstance()
+    val cal2 = Calendar.getInstance().apply { this.timeInMillis = timeInMillis }
+    return cal1.get(Calendar.ERA) == cal2.get(Calendar.ERA) &&
+            cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+            cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH)
+}
+
+
+
 
 @Preview
 @Composable
