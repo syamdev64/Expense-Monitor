@@ -6,12 +6,17 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [ExpenseEntity::class],
-    version = 1
+    entities = [
+        ExpenseEntity::class,
+        MonthlyBudgetEntity::class
+    ],
+    version = 2
 )
 abstract class ExpenseDatabase : RoomDatabase() {
 
     abstract fun expenseDao(): ExpenseDao
+    abstract fun settingsDao(): SettingsDao
+
 
     companion object {
 

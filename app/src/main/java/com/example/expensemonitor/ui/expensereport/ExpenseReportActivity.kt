@@ -81,7 +81,11 @@ class ExpenseReportActivity : ComponentActivity() {
             ExpenseMonitorTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
-                    Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                    ) {
                         ExpenseScreen()
                     }
 
@@ -342,7 +346,8 @@ fun ExpenseScreen() {
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(Color(0xFF070707))
             .padding(12.dp)
 
@@ -372,7 +377,9 @@ fun ExpenseScreen() {
         {
 
             items(filteredExpenses) { expense ->
-                ExpenseCard(expense)
+                ExpenseCard(expense, onDelete = {
+                    viewModel.delete(expense)
+                })
             }
 
         }
@@ -501,8 +508,6 @@ private fun isThisMonth(timeInMillis: Long): Boolean {
             cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
             cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH)
 }
-
-
 
 
 @Preview
