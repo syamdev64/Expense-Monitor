@@ -40,6 +40,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -53,6 +54,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -104,8 +106,17 @@ class ExpenseEnterActivity : ComponentActivity() {
 fun HomeScreenMain() {
     val viewModel: ExpenseViewModel = viewModel()
     val datePickerState = rememberDatePickerState()
+    val settings by viewModel.settings.observeAsState()
+    val expenses by viewModel.expenses.observeAsState(emptyList())
+    val totalSpent = expenses.sumOf { it.amount }
 
     HomeScreenContent(
+        monthlyBudget = settings?.monthlyBudget ?: 10000.0,
+        totalSpent = totalSpent,
+        onSaveBudget = { budget ->
+            viewModel.saveBudget(budget)
+        },
+
         onAddExpense = { amount, category, description, date ->
             viewModel.insert(amount, category, description, date)
         },
@@ -116,8 +127,11 @@ fun HomeScreenMain() {
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenContent(
+    monthlyBudget: Double,
+    totalSpent: Double,
+    onSaveBudget: (Double) -> Unit,
     onAddExpense: (Double, String, String, Long) -> Unit,
-    datePickerState: androidx.compose.material3.DatePickerState
+    datePickerState: DatePickerState
 ) {
 
     var amount by remember { mutableStateOf("") }
@@ -155,12 +169,14 @@ fun HomeScreenContent(
         mutableStateOf(ExpenseCategory.FOOD)
     }
 
-    val budget = 10000f
-    val spent = 6350f
-    val progress by animateFloatAsState(
-        targetValue = spent / budget, animationSpec = tween(1200), label = ""
-    )
+    val budget = monthlyBudget.toFloat()
+    val spent = totalSpent.toFloat()
 
+    val progress by animateFloatAsState(
+        targetValue = if (budget > 0f) (spent / budget).coerceAtMost(1f) else 0f,
+        animationSpec = tween(1200),
+        label = "BudgetProgress"
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -192,10 +208,9 @@ fun HomeScreenContent(
             label = ""
         )
 
-        var monthlyBudget by remember {
-            mutableStateOf("10000")
+        var budgetText by remember(monthlyBudget) {
+            mutableStateOf(monthlyBudget.toString())
         }
-
         // Glass Card
         Card(
             modifier = Modifier
@@ -205,7 +220,7 @@ fun HomeScreenContent(
 
                     rotationY = rotation
 //for 3d animation like full screen
-                    cameraDistance = 2 * density
+                    cameraDistance = 12 * density
                 }
                 .combinedClickable(
                     onClick = {},
@@ -221,7 +236,8 @@ fun HomeScreenContent(
             if (rotation <= 90f) {
 
                 FrontBudgetCard(
-                    budget = monthlyBudget,
+                    budget = budgetText,
+                    spent = spent.toInt().toString(),
                     progress = progress
                 )
 
@@ -236,14 +252,21 @@ fun HomeScreenContent(
                 ) {
 
                     BackBudgetCard(
-                        budget = monthlyBudget,
+                        budget = budgetText,
+
                         onBudgetChange = {
-                            monthlyBudget = it
+                            budgetText = it
                         },
+
                         onSave = {
 
-                            isFlipped = false
+                            budgetText.toDoubleOrNull()?.let {
 
+                                onSaveBudget(it)
+
+                            }
+
+                            isFlipped = false
                         }
                     )
 
@@ -472,6 +495,7 @@ fun HomeScreenContent(
 @Composable
 fun FrontBudgetCard(
     budget: String,
+    spent: String,
     progress: Float
 ) {
 
@@ -519,7 +543,7 @@ fun FrontBudgetCard(
             Spacer(Modifier.height(14.dp))
 
             Text(
-                "Spent ₹6,350",
+                "Spent ₹$spent",
                 color = Color.White
             )
 
@@ -600,10 +624,10 @@ fun BackBudgetCard(
 @Composable
 fun HomeScreenPreview() {
     ExpenseMonitorTheme {
-        HomeScreenContent(
-            onAddExpense = { _, _, _, _ -> },
-            datePickerState = rememberDatePickerState()
-        )
+//        HomeScreenContent(
+//            onAddExpense = { _, _, _, _ -> },
+//            datePickerState = rememberDatePickerState()
+//        )
     }
 }
 
