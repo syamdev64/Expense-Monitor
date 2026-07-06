@@ -1,48 +1,47 @@
 package com.example.expensemonitor.expenseviewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.expensemonitor.cloud.ExpenseFirestore
 import com.example.expensemonitor.repository.ExpenseRepository
+import com.example.expensemonitor.repository.FirestoreRepository
 import com.example.expensemonitor.repository.SettingsRepository
-import com.example.expensemonitor.roomdb.ExpenseDatabase
 import com.example.expensemonitor.roomdb.ExpenseEntity
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.launch
 
-class ExpenseViewModel(
-    application: Application
-) : AndroidViewModel(application) {
+@HiltViewModel
+class ExpenseViewModel @Inject constructor(
 
-    private val repository: ExpenseRepository
-    val expenses: LiveData<List<ExpenseEntity>>
-    private val database =
-        ExpenseDatabase.getDatabase(application)
+    private val repository: ExpenseRepository,
 
-    private val repositorysettings =
-        SettingsRepository(database.settingsDao())
+    private val settingsRepository: SettingsRepository,
+
+    private val firestoreRepository: FirestoreRepository
+
+) : ViewModel() {
+
+    val expenses: LiveData<List<ExpenseEntity>> =
+        repository.expenses.asLiveData()
 
     val settings =
-        repositorysettings.settings.asLiveData()
+        settingsRepository.settings.asLiveData()
 
     init {
 
-        val dao = ExpenseDatabase
-            .getDatabase(application)
-            .expenseDao()
+        repository.startFirestoreSync()
 
-        repository = ExpenseRepository(dao)
-
-        expenses = repository
-            .expenses
-            .asLiveData()
     }
 
     fun insert(
         amount: Double,
         category: String,
-        description: String,date:Long
+        description: String,
+        date: Long
     ) {
 
         viewModelScope.launch {
@@ -59,19 +58,59 @@ class ExpenseViewModel(
         }
 
     }
+
     fun delete(expense: ExpenseEntity) {
+
         viewModelScope.launch {
+
             repository.delete(expense)
+
         }
+
     }
+
     fun saveBudget(budget: Double) {
 
         viewModelScope.launch {
 
-            repositorysettings.saveBudget(budget)
+            settingsRepository.saveBudget(budget)
 
         }
 
     }
+
+//    fun saveExpenseToFirestore(
+//        amount: Double,
+//        category: String,
+//        description: String,
+//        date: Long
+//    ) {
+//
+//        firestoreRepository.saveExpense(
+//
+//            ExpenseFirestore(
+//
+//                amount,
+//                category,
+//                description,
+//                date
+//            ),
+//
+//            onSuccess = {
+//
+//            },
+//
+//            onFailure = {
+//
+//                Log.e(
+//                    "Firestore",
+//                    it.message ?: ""
+//                )
+//
+//            }
+//
+//        )
+//
+//    }
 
 }

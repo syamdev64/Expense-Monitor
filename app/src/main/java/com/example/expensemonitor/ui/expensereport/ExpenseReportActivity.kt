@@ -59,19 +59,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.expensemonitor.categorylist.ExpenseCategory
 import com.example.expensemonitor.expenseviewmodel.ExpenseViewModel
 import com.example.expensemonitor.modelclass.Expense
 import com.example.expensemonitor.modelclass.FilterType
 import com.example.expensemonitor.roomdb.ExpenseEntity
 import com.example.expensemonitor.ui.theme.ExpenseMonitorTheme
+import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Calendar
 import java.util.Locale
 import kotlin.collections.emptyList
 
+@AndroidEntryPoint
 class ExpenseReportActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -306,7 +308,7 @@ fun ExpenseCard(
 @Composable
 fun ExpenseScreen() {
 
-    val viewModel: ExpenseViewModel = viewModel()
+    val viewModel: ExpenseViewModel = hiltViewModel()
 
     val expenses by viewModel
         .expenses
@@ -512,6 +514,6 @@ private fun isThisMonth(timeInMillis: Long): Boolean {
 
 @Preview
 @Composable
-fun expensereport() {
+fun Expensereport() {
     ExpenseScreen()
 }

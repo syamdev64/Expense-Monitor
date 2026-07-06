@@ -1,7 +1,5 @@
 package com.example.expensemonitor.ui.dashboard
 
-import android.R
-import android.R.attr.rotationY
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.widget.Toast
@@ -72,14 +70,16 @@ import java.util.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.expensemonitor.categorylist.ExpenseCategory
 import com.example.expensemonitor.expenseviewmodel.ExpenseViewModel
 import com.example.expensemonitor.ui.navigation.AppNavigation
 import com.example.expensemonitor.ui.theme.ExpenseMonitorTheme
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
-import kotlin.text.format
 
+@AndroidEntryPoint
 class ExpenseEnterActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,7 +104,7 @@ class ExpenseEnterActivity : ComponentActivity() {
 
 @Composable
 fun HomeScreenMain() {
-    val viewModel: ExpenseViewModel = viewModel()
+    val viewModel: ExpenseViewModel = hiltViewModel()
     val datePickerState = rememberDatePickerState()
     val settings by viewModel.settings.observeAsState()
     val expenses by viewModel.expenses.observeAsState(emptyList())
@@ -119,6 +119,7 @@ fun HomeScreenMain() {
 
         onAddExpense = { amount, category, description, date ->
             viewModel.insert(amount, category, description, date)
+                //   viewModel.saveExpenseToFirestore(amount, category, description, date)
         },
         datePickerState = datePickerState
     )
@@ -198,8 +199,6 @@ fun HomeScreenContent(
         )
 
         Spacer(Modifier.height(24.dp))
-
-
 
 
         val rotation by animateFloatAsState(
@@ -552,6 +551,7 @@ fun FrontBudgetCard(
     }
 
 }
+
 @Composable
 fun BackBudgetCard(
     budget: String,
@@ -611,8 +611,10 @@ fun BackBudgetCard(
                     containerColor = Color.Gray.copy(alpha = 0.4f)
                 )
             ) {
-                Text("Cancel",
-                    color = Color.White)
+                Text(
+                    "Cancel",
+                    color = Color.White
+                )
 
             }
         }
