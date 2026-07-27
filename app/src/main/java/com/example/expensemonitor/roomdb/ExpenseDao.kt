@@ -31,4 +31,13 @@ interface ExpenseDao {
 
     @Query("DELETE FROM expenses")
     suspend fun deleteAllExpenses()
+    @Query("""
+SELECT COALESCE(SUM(amount), 0)
+FROM expenses
+WHERE date BETWEEN :startDate AND :endDate
+""")
+    fun getCurrentMonthExpense(
+        startDate: Long,
+        endDate: Long
+    ): Flow<Double>
 }

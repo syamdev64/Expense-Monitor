@@ -1,5 +1,6 @@
 package com.example.expensemonitor.ui.dashboard
 
+import android.R
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.widget.Toast
@@ -35,7 +36,6 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
@@ -71,7 +71,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.expensemonitor.categorylist.ExpenseCategory
 import com.example.expensemonitor.expenseviewmodel.ExpenseViewModel
 import com.example.expensemonitor.ui.navigation.AppNavigation
@@ -110,16 +109,31 @@ fun HomeScreenMain() {
     val expenses by viewModel.expenses.observeAsState(emptyList())
     val totalSpent = expenses.sumOf { it.amount }
 
+
+    val currentMonthExpense by viewModel.currentMonthExpense.observeAsState(0.0)
+
+    val monthlyBudget = settings?.monthlyBudget ?: 0.0
+    val remaining = monthlyBudget - currentMonthExpense
+    val progress =
+        if (monthlyBudget > 0)
+            (currentMonthExpense / monthlyBudget).toFloat()
+        else
+            0f
+
+
     HomeScreenContent(
-        monthlyBudget = settings?.monthlyBudget ?: 10000.0,
-        totalSpent = totalSpent,
+        monthlyBudget = monthlyBudget,
+        //totalSpent = totalSpent,
+        totalSpent = currentMonthExpense,
+        remaining = remaining,
+        progressValue = progress,
         onSaveBudget = { budget ->
             viewModel.saveBudget(budget)
         },
 
         onAddExpense = { amount, category, description, date ->
             viewModel.insert(amount, category, description, date)
-                //   viewModel.saveExpenseToFirestore(amount, category, description, date)
+            //   viewModel.saveExpenseToFirestore(amount, category, description, date)
         },
         datePickerState = datePickerState
     )
@@ -130,6 +144,8 @@ fun HomeScreenMain() {
 fun HomeScreenContent(
     monthlyBudget: Double,
     totalSpent: Double,
+    remaining: Double,
+    progressValue: Float,
     onSaveBudget: (Double) -> Unit,
     onAddExpense: (Double, String, String, Long) -> Unit,
     datePickerState: DatePickerState
@@ -170,14 +186,18 @@ fun HomeScreenContent(
         mutableStateOf(ExpenseCategory.FOOD)
     }
 
-    val budget = monthlyBudget.toFloat()
-    val spent = totalSpent.toFloat()
-
-    val progress by animateFloatAsState(
-        targetValue = if (budget > 0f) (spent / budget).coerceAtMost(1f) else 0f,
+//    val budget = monthlyBudget.toFloat()
+//    val spent = totalSpent.toFloat()
+    val animatedProgress by animateFloatAsState(
+        targetValue = progressValue.coerceIn(0f, 1f),
         animationSpec = tween(1200),
         label = "BudgetProgress"
     )
+//    val progress by animateFloatAsState(
+//        targetValue = if (budget > 0f) (spent / budget).coerceAtMost(1f) else 0f,
+//        animationSpec = tween(1200),
+//        label = "BudgetProgress"
+//    )
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -236,8 +256,9 @@ fun HomeScreenContent(
 
                 FrontBudgetCard(
                     budget = budgetText,
-                    spent = spent.toInt().toString(),
-                    progress = progress
+                    spent = totalSpent?.toInt().toString(),
+                    remaining = remaining?.toInt().toString(),
+                    progress = animatedProgress
                 )
 
             } else {
@@ -293,7 +314,8 @@ fun HomeScreenContent(
                     drawArc(
                         color = Color.LightGray.copy(alpha = .3f),
                         startAngle = -90f,
-                        sweepAngle = 360f,
+//                        sweepAngle = 360f,
+                        sweepAngle = animatedProgress * 360f,
                         useCenter = false,
                         style = Stroke(
                             width = 8f, cap = StrokeCap.Round
@@ -307,7 +329,7 @@ fun HomeScreenContent(
                             )
                         ),
                         startAngle = -90f,
-                        sweepAngle = progress * 360,
+                        sweepAngle = animatedProgress * 360,
                         useCenter = false,
                         style = Stroke(
                             width = 8f, cap = StrokeCap.Round
@@ -321,7 +343,7 @@ fun HomeScreenContent(
                 ) {
 
                     Text(
-                        "${(progress * 100).toInt()}%",
+                        "${(animatedProgress * 100).toInt()}%",
                         fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -495,6 +517,7 @@ fun HomeScreenContent(
 fun FrontBudgetCard(
     budget: String,
     spent: String,
+    remaining: String,
     progress: Float
 ) {
 
@@ -539,11 +562,19 @@ fun FrontBudgetCard(
                 trackColor = Color.White.copy(.25f),
                 strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
             )
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(10.dp))
 
             Text(
                 "Spent ₹$spent",
                 color = Color.White
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Remaining ₹$remaining",
+                color = Color(0xFF00E676),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium
             )
 
         }
@@ -599,9 +630,15 @@ fun BackBudgetCard(
         ) {
             Button(
                 onClick = onSave,
-                modifier = Modifier.weight(1f) // Share width equally
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF00C853)
+                )
             ) {
-                Text("Save")
+                Text(
+                    "Save",
+                    color = Color.White
+                )
             }
 
             Button(

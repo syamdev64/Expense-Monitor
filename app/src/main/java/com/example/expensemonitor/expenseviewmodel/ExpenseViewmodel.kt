@@ -13,6 +13,7 @@ import com.example.expensemonitor.roomdb.ExpenseEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 @HiltViewModel
 class ExpenseViewModel @Inject constructor(
@@ -30,6 +31,16 @@ class ExpenseViewModel @Inject constructor(
 
     val settings =
         settingsRepository.settings.asLiveData()
+
+
+
+    private val monthRange = getCurrentMonthRange()
+    private val startDate = monthRange.first
+    private val endDate = monthRange.second
+    val currentMonthExpense: LiveData<Double> =
+        repository.getCurrentMonthExpense(startDate, endDate)
+            .asLiveData()
+
 
     init {
 
@@ -79,38 +90,25 @@ class ExpenseViewModel @Inject constructor(
 
     }
 
-//    fun saveExpenseToFirestore(
-//        amount: Double,
-//        category: String,
-//        description: String,
-//        date: Long
-//    ) {
-//
-//        firestoreRepository.saveExpense(
-//
-//            ExpenseFirestore(
-//
-//                amount,
-//                category,
-//                description,
-//                date
-//            ),
-//
-//            onSuccess = {
-//
-//            },
-//
-//            onFailure = {
-//
-//                Log.e(
-//                    "Firestore",
-//                    it.message ?: ""
-//                )
-//
-//            }
-//
-//        )
-//
-//    }
+
+    private fun getCurrentMonthRange(): Pair<Long, Long> {
+
+        val calendar = Calendar.getInstance()
+
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+
+        val start = calendar.timeInMillis
+
+        calendar.add(Calendar.MONTH, 1)
+        calendar.add(Calendar.MILLISECOND, -1)
+
+        val end = calendar.timeInMillis
+
+        return Pair(start, end)
+    }
 
 }

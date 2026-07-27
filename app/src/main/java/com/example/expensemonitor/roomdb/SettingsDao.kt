@@ -15,4 +15,5 @@ interface SettingsDao {
     @Query("SELECT * FROM monthtotal WHERE id = 1")
     fun getSettings(): Flow<MonthlyBudgetEntity?>
 
+
 }

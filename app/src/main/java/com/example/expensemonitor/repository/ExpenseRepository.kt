@@ -8,6 +8,7 @@ import com.example.expensemonitor.roomdb.MonthlyBudgetEntity
 import com.example.expensemonitor.roomdb.SettingsDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class ExpenseRepository(
@@ -70,6 +71,12 @@ class ExpenseRepository(
                 dao.insertAll(entities)
             }
         }
+    }
+    fun getCurrentMonthExpense(
+        startDate: Long,
+        endDate: Long
+    ): Flow<Double> {
+        return dao.getCurrentMonthExpense(startDate, endDate)
     }
 
 }

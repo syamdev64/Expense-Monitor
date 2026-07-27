@@ -7,5 +7,10 @@ import androidx.room.PrimaryKey
 data class MonthlyBudgetEntity(
     @PrimaryKey
     val id: Int = 1,
-    val monthlyBudget: Double
+
+    val monthlyBudget: Double,
+
+    val lastResetMonth: Int = 0,
+
+    val lastResetYear: Int = 0
 )

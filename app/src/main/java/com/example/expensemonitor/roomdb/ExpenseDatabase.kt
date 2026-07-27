@@ -10,7 +10,7 @@ import androidx.room.RoomDatabase
         ExpenseEntity::class,
         MonthlyBudgetEntity::class
     ],
-    version = 2
+    version = 3
 )
 abstract class ExpenseDatabase : RoomDatabase() {
 
