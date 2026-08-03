@@ -26,7 +26,8 @@ object DatabaseModule {
             context,
             ExpenseDatabase::class.java,
             "expense_db"
-        ).build()
+        ).addMigrations(ExpenseDatabase.MIGRATION_3_4)
+            .build()
 
     }
 

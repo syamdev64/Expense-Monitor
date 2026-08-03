@@ -12,5 +12,7 @@ data class MonthlyBudgetEntity(
 
     val lastResetMonth: Int = 0,
 
-    val lastResetYear: Int = 0
+    val lastResetYear: Int = 0,
+
+    val isBiometricEnabled: Boolean = false
 )

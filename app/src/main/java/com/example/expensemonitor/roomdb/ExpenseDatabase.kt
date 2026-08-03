@@ -4,13 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [
         ExpenseEntity::class,
         MonthlyBudgetEntity::class
     ],
-    version = 3
+    version = 4
 )
 abstract class ExpenseDatabase : RoomDatabase() {
 
@@ -23,6 +25,12 @@ abstract class ExpenseDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: ExpenseDatabase? = null
 
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE monthtotal ADD COLUMN isBiometricEnabled INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
         fun getDatabase(context: Context): ExpenseDatabase {
 
             return INSTANCE ?: synchronized(this) {
@@ -31,7 +39,9 @@ abstract class ExpenseDatabase : RoomDatabase() {
                     context,
                     ExpenseDatabase::class.java,
                     "expense_db"
-                ).build()
+                )
+                    .addMigrations(MIGRATION_3_4)
+                    .build()
 
                 INSTANCE = instance
 

@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.expensemonitor.auth.AuthViewModel
 import com.example.expensemonitor.categorylist.ExpenseCategory
 import com.example.expensemonitor.expenseviewmodel.ExpenseViewModel
 import com.example.expensemonitor.roomdb.ExpenseEntity
@@ -40,7 +41,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun ReportScreen() {
+fun ReportScreen(authViewModel: AuthViewModel = hiltViewModel()) {
     val viewModel: ExpenseViewModel = hiltViewModel()
     val expenses by viewModel.expenses.observeAsState(emptyList())
     var selectedChartType by remember { mutableStateOf(ChartType.PIE) }
@@ -48,9 +49,10 @@ fun ReportScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .statusBarsPadding()
             .background(Color.Black)
-            .padding(16.dp)
-            .padding(bottom = 70.dp)
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 110.dp)
     ) {
         Text(
             "Spend Analyzer",

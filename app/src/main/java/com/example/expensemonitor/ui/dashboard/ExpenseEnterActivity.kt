@@ -4,7 +4,7 @@ import android.R
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.animateFloatAsState
@@ -20,11 +20,15 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -71,6 +75,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.expensemonitor.auth.AuthViewModel
 import com.example.expensemonitor.categorylist.ExpenseCategory
 import com.example.expensemonitor.expenseviewmodel.ExpenseViewModel
 import com.example.expensemonitor.ui.navigation.AppNavigation
@@ -79,7 +84,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
 
 @AndroidEntryPoint
-class ExpenseEnterActivity : ComponentActivity() {
+class ExpenseEnterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,7 +96,7 @@ class ExpenseEnterActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxSize()
                             .background(color = Color.Black)
-                            .padding(innerPadding)
+                            .padding(bottom = innerPadding.calculateBottomPadding())
                     ) {
                         AppNavigation()
                     }
@@ -102,7 +107,7 @@ class ExpenseEnterActivity : ComponentActivity() {
 }
 
 @Composable
-fun HomeScreenMain() {
+fun HomeScreenMain(authViewModel: AuthViewModel = hiltViewModel()) {
     val viewModel: ExpenseViewModel = hiltViewModel()
     val datePickerState = rememberDatePickerState()
     val settings by viewModel.settings.observeAsState()
@@ -201,9 +206,10 @@ fun HomeScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .statusBarsPadding()
             .background(Color(0xFF070707))
             .verticalScroll(rememberScrollState())
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 110.dp),
+            .padding(start = 16.dp, end = 16.dp, bottom = 110.dp),
 
         ) {
 

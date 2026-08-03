@@ -6,95 +6,86 @@ import com.example.expensemonitor.roomdb.ExpenseEntity
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
-class FirestoreRepository {
+class FirestoreRepository @Inject constructor(
+    private val db: FirebaseFirestore
+) {
 
-    private val db = FirebaseFirestore.getInstance()
+    private fun userExpensesCollection(uid: String) =
+        db.collection("users").document(uid).collection("expenses")
 
-//    suspend fun insertExpense(expense: ExpenseEntity) {
-//
-//        db.collection("expenses")
-//            .document(expense.id.toString())
-//            .set(expense)
-//            .await()
-//
-//    }
-suspend fun insertExpense(expense: ExpenseEntity) {
+    private fun userProfileDocument(uid: String) =
+        db.collection("users").document(uid)
 
-    val firestoreExpense = ExpenseFirestoreData(
+    suspend fun savePhoneNumber(uid: String, phoneNumber: String) {
+        userProfileDocument(uid)
+            .set(mapOf("phoneNumber" to phoneNumber), com.google.firebase.firestore.SetOptions.merge())
+            .await()
+    }
 
-        amount = expense.amount,
+    suspend fun saveUserProfile(uid: String, name: String, email: String, phoneNumber: String, photoUrl: String?) {
+        val profileData = mapOf(
+            "uid" to uid,
+            "displayName" to name,
+            "email" to email,
+            "phoneNumber" to phoneNumber,
+            "photoUrl" to (photoUrl ?: "")
+        )
+        userProfileDocument(uid)
+            .set(profileData, com.google.firebase.firestore.SetOptions.merge())
+            .await()
+    }
 
-        category = expense.category,
+    suspend fun getUserPhoneNumber(uid: String): String? {
+        return try {
+            val snapshot = userProfileDocument(uid).get().await()
+            snapshot.getString("phoneNumber")
+        } catch (e: Exception) {
+            null
+        }
+    }
 
-        description = expense.description,
+    suspend fun insertExpense(uid: String, expense: ExpenseEntity) {
+        val firestoreExpense = ExpenseFirestoreData(
+            amount = expense.amount,
+            category = expense.category,
+            description = expense.description,
+            date = expense.date
+        )
 
-        date = expense.date
+        userExpensesCollection(uid)
+            .document(expense.id.toString())
+            .set(firestoreExpense)
+            .await()
+    }
 
-    )
-
-    db.collection("expenses")
-        .document(expense.id.toString())
-        .set(firestoreExpense)
-        .await()
-}
-
-    suspend fun deleteExpense(id: Int) {
-
-        db.collection("expenses")
+    suspend fun deleteExpense(uid: String, id: Int) {
+        userExpensesCollection(uid)
             .document(id.toString())
             .delete()
             .await()
-
     }
 
-    suspend fun updateExpense(expense: ExpenseEntity) {
-
-        db.collection("expenses")
+    suspend fun updateExpense(uid: String, expense: ExpenseEntity) {
+        userExpensesCollection(uid)
             .document(expense.id.toString())
             .set(expense)
             .await()
-
-    }
-
-    fun saveExpense(
-        expense: ExpenseFirestore,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-
-        db.collection("expenses")
-            .add(expense)
-            .addOnSuccessListener {
-
-                onSuccess()
-
-            }
-            .addOnFailureListener {
-
-                onFailure(it)
-
-            }
-
     }
 
     fun observeExpenses(
+        uid: String,
         onResult: (List<ExpenseFirestore>) -> Unit
     ) {
-
-        db.collection("expenses")
+        userExpensesCollection(uid)
             .orderBy("date", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
-
                 if (error != null) return@addSnapshotListener
-
                 val list = snapshot
                     ?.toObjects(ExpenseFirestore::class.java)
                     ?: emptyList()
-
                 onResult(list)
             }
     }
-
-    }
-
+}
