@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "745575712150",
+    "project_id": "expense-monitor-6eaf5",
+    "storage_bucket": "expense-monitor-6eaf5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:745575712150:android:58d66b3bbee9ad1e2049b7",
+        "android_client_info": {
+          "package_name": "com.example.expensemonitor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "745575712150-ss2vh2g8m59ur8upfvganpikdoq5igs5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.expensemonitor",
+            "certificate_hash": "d6b041f49f4129389e82ba66dfe7ff952c6b66f9"
+          }
+        },
+        {
+          "client_id": "745575712150-1evob6bg0j0ih9utsfpor8n4pllk427e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSb-4PCQzyqYoiwMmeliN97FQpxPUDq2o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "745575712150-1evob6bg0j0ih9utsfpor8n4pllk427e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
