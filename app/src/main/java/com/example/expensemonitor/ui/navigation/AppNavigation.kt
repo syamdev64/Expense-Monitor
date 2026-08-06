@@ -22,13 +22,13 @@ import com.example.expensemonitor.ui.dashboard.ProfileScreen
 import com.example.expensemonitor.ui.dashboard.ReportScreen
 import com.example.expensemonitor.ui.expensereport.ExpenseScreen
 import androidx.hilt.navigation.compose.hiltViewModel
-import kotlinx.coroutines.flow.first
+import com.example.expensemonitor.ui.components.AuroraBackground
 
 @Composable
 fun AppNavigation() {
     val context = LocalContext.current
     val authViewModel: AuthViewModel = hiltViewModel(context as FragmentActivity)
-    
+
     val user by authViewModel.currentUser.collectAsState()
     val isFirstTime by authViewModel.isFirstTime.collectAsState(initial = true)
     val savedMpin by authViewModel.mpin.collectAsState(initial = null)
@@ -48,6 +48,7 @@ fun AppNavigation() {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+        AuroraBackground()
         NavHost(
             navController = navController,
             startDestination = "splash"

@@ -95,7 +95,7 @@ class ExpenseEnterActivity : AppCompatActivity() {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(color = Color.Black)
+                            .background(Color.Transparent)
                             .padding(bottom = innerPadding.calculateBottomPadding())
                     ) {
                         AppNavigation()
@@ -207,7 +207,7 @@ fun HomeScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
-            .background(Color(0xFF070707))
+            .background(Color.Transparent)
             .verticalScroll(rememberScrollState())
             .padding(start = 16.dp, end = 16.dp, bottom = 110.dp),
 
