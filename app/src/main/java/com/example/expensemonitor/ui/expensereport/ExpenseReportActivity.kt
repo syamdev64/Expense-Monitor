@@ -353,7 +353,7 @@ fun ExpenseScreen(authViewModel: AuthViewModel = hiltViewModel()) {
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
-            .background(Color(0xFF070707))
+            .background(Color.Transparent)
             .padding(horizontal = 12.dp)
 
     ) {

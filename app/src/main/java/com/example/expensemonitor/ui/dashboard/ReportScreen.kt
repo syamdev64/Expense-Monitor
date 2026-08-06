@@ -50,7 +50,7 @@ fun ReportScreen(authViewModel: AuthViewModel = hiltViewModel()) {
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
-            .background(Color.Black)
+            .background(Color.Transparent)
             .padding(horizontal = 16.dp)
             .padding(bottom = 110.dp)
     ) {

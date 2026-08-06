@@ -130,7 +130,7 @@ fun ProfileScreen(
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
-            .background(Color.Black)
+            .background(Color.Transparent)
             .padding(horizontal = 16.dp)
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
